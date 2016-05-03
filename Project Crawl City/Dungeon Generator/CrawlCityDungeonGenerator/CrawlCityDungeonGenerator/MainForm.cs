@@ -19,12 +19,15 @@ namespace CrawlCityDungeonGenerator
 
         private MapPainter mapPainter;
 
+        private MapPainterConfig mapConfig;
+
         #endregion
 
         public MainForm()
         {
             InitializeComponent();
-            mapPainter = new MapPainter();
+            mapConfig = new MapPainterConfig(20);
+            mapPainter = new MapPainter(mapConfig);
             this.DoubleBuffered = true;
         }
 
@@ -35,23 +38,22 @@ namespace CrawlCityDungeonGenerator
 
         private void MainPictureBox_Paint(object sender, PaintEventArgs e)
         {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
+            int offsetX = MainPictureBox.Size.Width / 4;
+            int offsetY = MainPictureBox.Size.Height / 4;
+            Bitmap bitmap = new Bitmap(
+                MainPictureBox.Size.Width + offsetX * 2,
+                MainPictureBox.Size.Height + offsetY * 2);
 
-            Bitmap bitmap = new Bitmap(MainPictureBox.Size.Width, MainPictureBox.Size.Height);
-            //Bitmap bitmap = new Bitmap((int)e.Graphics.VisibleClipBounds.Width, (int)e.Graphics.VisibleClipBounds.Height);
-            mapPainter.Config = new MapPainterConfig(20) { DrawLineGrid = checkBoxDrawGridToggle.Checked};
+            mapPainter.Config.DrawLineGrid = checkBoxDrawGridToggle.Checked;
             mapPainter.Paint(bitmap);
 
-            sw.Stop();
-            var t1 = sw.ElapsedMilliseconds.ToString();
-            
-            sw.Restart();
+            //e.Graphics.DrawImage(bitmap, 0, 0, bitmap.Width, bitmap.Height);
+            e.Graphics.DrawImage(
+                bitmap,
+                new Rectangle(0, 0, MainPictureBox.Size.Width, MainPictureBox.Size.Height),
+                new Rectangle(offsetX, offsetY, MainPictureBox.Size.Width + offsetX, MainPictureBox.Size.Height + offsetY), 
+                GraphicsUnit.Pixel);
 
-            e.Graphics.DrawImage(bitmap, 0, 0, bitmap.Width, bitmap.Height);
-
-            sw.Stop();
-            this.Text = t1.ToString() + "|" + sw.ElapsedMilliseconds.ToString();
         }
 
         private void MainPictureBox_Resize(object sender, EventArgs e)
@@ -67,6 +69,8 @@ namespace CrawlCityDungeonGenerator
         private void StartButton_Click(object sender, EventArgs e)
         {
             DemoGrid grid = new DemoGrid(new Size(10,10));
+            mapPainter.Map = grid;
+            MainPictureBox.Refresh();
         }
     }
 }

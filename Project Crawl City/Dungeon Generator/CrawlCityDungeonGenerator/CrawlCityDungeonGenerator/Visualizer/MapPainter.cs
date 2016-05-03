@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using CrawlCityDungeonGenerator.MapData;
 
 namespace CrawlCityDungeonGenerator.Visualizer
 {
@@ -12,6 +13,8 @@ namespace CrawlCityDungeonGenerator.Visualizer
 
         public MapPainterConfig Config { get; set; }
 
+        public DemoGrid Map { get; set; }
+
         #endregion
 
         #region Constructor
@@ -20,8 +23,13 @@ namespace CrawlCityDungeonGenerator.Visualizer
         /// Constructor
         /// </summary>
         public MapPainter()
+            :this(new MapPainterConfig(20))
         {
-            Config = new MapPainterConfig(20);
+        }
+
+        public MapPainter(MapPainterConfig config)
+        {
+            Config = config;
         }
         
         #endregion
@@ -32,6 +40,9 @@ namespace CrawlCityDungeonGenerator.Visualizer
         {
             try
             {
+                if (Map == null)
+                    return;
+
                 PaintGrid(bitmap);
             }
             catch(Exception e)
